@@ -4,11 +4,12 @@ from telegram.constants import ParseMode
 import logging
 from dotenv import load_dotenv
 import os
+import asyncio
+
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a greeting message and a button to launch the mini app."""
@@ -36,7 +37,8 @@ async def main() -> None:
     application.add_handler(CommandHandler("start", start))
 
     # Start the Bot
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    # Use asyncio.run to run the async main function
+    asyncio.run(main())
