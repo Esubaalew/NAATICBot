@@ -1,56 +1,69 @@
-from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, ContextTypes
-from telegram.constants import ParseMode
+#!/usr/bin/env python
+# pylint: disable=unused-argument
+# This program is dedicated to the public domain under the CC0 license.
+
+"""
+Telegram Bot that replies to messages and includes a button for launching a mini-app.
+"""
+
 import logging
-from dotenv import load_dotenv
 import os
-import asyncio
+
+from dotenv import load_dotenv
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ForceReply
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram.constants import ParseMode
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
+# Define command handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a greeting message and a button to launch the mini app."""
-    chat_id = update.effective_chat.id
+    user = update.effective_user
 
-    # Create a button to launch the Web App
+    # Create a button to launch the Web App (mini app)
     button = InlineKeyboardButton(text="Open Mini App", web_app={"url": "https://naatic.esube.com.et/mini-app"})
     keyboard = InlineKeyboardMarkup([[button]])
 
     # Send a greeting message with the button
-    await context.bot.send_message(
-        chat_id=chat_id,
-        text=f"Hello! {update.effective_chat.first_name}, I am NAATICbot. I am here to help you with your NAATIC experience. Click the button below to launch the mini app.",
+    await update.message.reply_html(
+        text=f"Hi {user.mention_html()}! Click the button below to launch the mini app.",
         reply_markup=keyboard,
-        parse_mode=ParseMode.HTML
     )
 
-async def main() -> None:
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message when the command /help is issued."""
+    await update.message.reply_text("This bot can help you interact with the NAATIC mini-app. Use /start to begin!")
+
+
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Echo the user message."""
+    await update.message.reply_text(update.message.text)
+
+
+def main() -> None:
     """Start the bot."""
     # Load environment variables
     load_dotenv()
-    application = Application.builder().token(os.environ['TOKEN']).build()
 
-    # Add command handler for the `/start` command
+    # Create the Application and pass it your bot's token
+    application = Application.builder().token(os.environ["TOKEN"]).build()
+
+    # Handlers for commands like /start and /help
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
 
-    # Start the Bot
-    await application.run_polling()
+    # Echo handler for non-command text messages
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
-if __name__ == '__main__':
-    try:
-        # Check if there is already an event loop running
-        loop = asyncio.get_running_loop()
-    except RuntimeError:  # If no event loop is running, create one
-        loop = None
+    # Start the Bot and run until manually stopped (Ctrl + C)
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-    if loop and loop.is_running():
-        logger.info("Detected running event loop. Scheduling main() on the existing loop.")
-        # Schedule main() coroutine on the existing loop
-        asyncio.ensure_future(main())
-    else:
-        logger.info("No running event loop detected. Starting a new one.")
-        # Start a new event loop
-        asyncio.run(main())
+
+if __name__ == "__main__":
+    main()
