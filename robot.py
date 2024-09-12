@@ -31,14 +31,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     # Send a greeting message with the button
     await update.message.reply_html(
-        text=f"Hi {user.mention_html()}! Click the button below to launch the mini app.",
+        text=f"Hi {user.mention_html()}! Click the button below to launch the mini app.\nFor More information: https://naatic.esube.com.et/",
         reply_markup=keyboard,
     )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    await update.message.reply_text("This bot can help you interact with the NAATIC mini-app. Use /start to begin!")
+    await update.message.reply_text("This bot can help you interact with the NAATIC mini-app. Use /start to begin!\n\n For More information: https://naatic.esube.com.et/")
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
