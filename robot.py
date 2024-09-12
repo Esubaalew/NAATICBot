@@ -36,7 +36,7 @@ async def main() -> None:
     application.add_handler(CommandHandler("start", start))
 
     # Start the Bot
-    await application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
     main()
