@@ -26,12 +26,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
 
     # Create a button to launch the Web App (mini app)
-    button = InlineKeyboardButton(text="Open Mini App", web_app={"url": "https://naatic.esube.com.et/mini-app"})
+    button = InlineKeyboardButton(text="View Products", web_app={"url": "https://naatic.esube.com.et/mini-app"})
     keyboard = InlineKeyboardMarkup([[button]])
 
     # Send a greeting message with the button
     await update.message.reply_html(
-        text=f"Hi {user.mention_html()}! Click the button below to launch the mini app.\nFor More information: https://naatic.esube.com.et/",
+        text=f"Hi {user.mention_html()}! Click the button below to view clothings from NAATIK.\nFor More information: https://naatic.esube.com.et/",
         reply_markup=keyboard,
     )
 
