@@ -40,5 +40,17 @@ async def main() -> None:
     await application.run_polling()
 
 if __name__ == '__main__':
-    # Use asyncio.run to run the async main function
-    asyncio.run(main())
+    try:
+        # Check if there is already an event loop running
+        loop = asyncio.get_running_loop()
+    except RuntimeError:  # If no event loop is running, create one
+        loop = None
+
+    if loop and loop.is_running():
+        logger.info("Detected running event loop. Scheduling main() on the existing loop.")
+        # Schedule main() coroutine on the existing loop
+        asyncio.ensure_future(main())
+    else:
+        logger.info("No running event loop detected. Starting a new one.")
+        # Start a new event loop
+        asyncio.run(main())
